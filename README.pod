@@ -1,0 +1,7 @@
+
+=pod
+
+Fliggy inherits Twiggy and adds support for inlined Flash Policy server (useful
+for L<Plack::Middleware::SocketIO> or Flash WebSocket fallback).
+
+No need to run Flash Policy server as root on 843 port!
