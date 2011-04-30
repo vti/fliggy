@@ -5,3 +5,8 @@ Fliggy inherits Twiggy and adds support for inlined Flash Policy server (useful
 for L<Plack::Middleware::SocketIO> or Flash WebSocket fallback).
 
 No need to run Flash Policy server as root on 843 port!
+
+=head1 Usage
+
+Exactly the same as L<Twiggy>, whenever you run C<twiggy> command, replace it
+with C<fliggy> and you're ready to go.
