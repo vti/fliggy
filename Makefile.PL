@@ -36,5 +36,5 @@ WriteMakefile(
 
     EXE_FILES => ['bin/fliggy'],
     PREREQ_PM => {'Twiggy' => '0'},
-    test      => {TESTS => 't/*.t}
+    test      => {TESTS => 't/*.t'}
 );
