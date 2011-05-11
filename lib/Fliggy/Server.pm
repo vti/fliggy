@@ -78,3 +78,18 @@ EOF
 }
 
 1;
+__END__
+
+=head1 NAME
+
+Fliggy::Server - Fliggy implementation
+
+=head1 DESCRIPTION
+
+This is an actual L<Fliggy> implementation.
+
+=head1 SEE ALSO
+
+L<Fliggy> L<Twiggy>
+
+=cut
