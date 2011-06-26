@@ -16,40 +16,64 @@ use constant DEBUG => $ENV{FLIGGY_DEBUG};
 
 # Copied from Twiggy::Server (can't stand copypasting, but this is the only way)
 sub _try_read_headers {
-    my ( $self, $sock, undef ) = @_;
+    my ($self, $sock, undef) = @_;
 
     # FIXME add a timer to manage read timeouts
     local $/ = "\012";
 
-    read_more: for my $headers ( $_[2] ) {
-        if ( defined(my $line = <$sock>) ) {
-            if ($line eq "<policy-file-request/>\0") {
-                DEBUG && warn "Flash policy request\n";
-                $self->_write_flash_policy_response($sock);
-                die;
+  read_more: for my $headers ($_[2]) {
+        if ($headers eq '') {
+            my $buf = $self->_safe_read($sock, 1);
+            return unless defined $buf;
+
+            if ($buf eq '<') {
+                $buf = $self->_safe_read($sock, 22);
+                return unless defined $buf;
+
+                if ($buf eq "policy-file-request/>\0") {
+                    DEBUG && warn "Flash policy request\n";
+                    $self->_write_flash_policy_response($sock);
+                    die;
+                }
+                else {
+                    $headers .= $buf;
+                }
             }
+            else {
+                $headers .= $buf;
+            }
+        }
+
+        if (defined(my $line = <$sock>)) {
             $headers .= $line;
 
-            if ( $line eq "\015\012" or $line eq "\012" ) {
+            if ($line eq "\015\012" or $line eq "\012") {
+
                 # got an empty line, we're done reading the headers
                 return 1;
-            } else {
+            }
+            else {
+
                 # try to read more lines using buffered IO
                 redo read_more;
             }
-        } elsif ($! and $! != EAGAIN && $! != EINTR && $! != WSAEWOULDBLOCK ) {
+        }
+        elsif ($! and $! != EAGAIN && $! != EINTR && $! != WSAEWOULDBLOCK) {
             die $!;
-        } elsif (!$!) {
+        }
+        elsif (!$!) {
             die "client disconnected";
         }
     }
 
-    DEBUG && warn "$sock did not read to end of req, wait for more data to arrive\n";
+    DEBUG
+      && warn
+      "$sock did not read to end of req, wait for more data to arrive\n";
     return;
 }
 
 sub _write_flash_policy_response {
-    my ( $self, $sock ) = @_;
+    my ($self, $sock) = @_;
 
     return unless defined $sock and defined fileno $sock;
 
@@ -66,15 +90,39 @@ EOF
     my $cv = AE::cv;
 
     # From _write_psgi_response
-    $self->_write_body($sock, [$body])->cb(sub {
-        shutdown $sock, 1;
-        close $sock;
-        $self->{exit_guard}->end;
-        local $@;
-        eval { $cv->send($_[0]->recv); 1 } or $cv->croak($@);
-    });
+    $self->_write_body($sock, [$body])->cb(
+        sub {
+            shutdown $sock, 1;
+            close $sock;
+            $self->{exit_guard}->end;
+            local $@;
+            eval { $cv->send($_[0]->recv); 1 } or $cv->croak($@);
+        }
+    );
 
     return;
+}
+
+sub _safe_read {
+    my $self = shift;
+    my ($sock, $size) = @_;
+
+    my $rcount = sysread($sock, my $buf, $size);
+
+    if (!defined $buf || !defined $rcount) {
+        if ($! and $! != EAGAIN && $! != EINTR && $! != WSAEWOULDBLOCK) {
+            die $!;
+        }
+        elsif (!$!) {
+            die "client disconnected";
+        }
+
+        return;
+    }
+
+    return unless $rcount == $size;
+
+    return $buf;
 }
 
 1;
