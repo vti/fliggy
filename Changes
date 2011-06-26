@@ -1,5 +1,9 @@
 Revision history for perl module Fliggy
 
+0.009002 2011-06-26
+
+ - Smart reading of the first request line
+
 0.009001 2011-05-11
 
  - Initial release
