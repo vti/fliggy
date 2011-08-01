@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    $ENV{TWIGGY_DEBUG} = $ENV{FLIGGY_DEBUG};
+    $ENV{TWIGGY_DEBUG} = $ENV{FLIGGY_DEBUG} || 0;
 }
 
 use base 'Twiggy::Server';
