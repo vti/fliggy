@@ -60,6 +60,8 @@ Viacheslav Tykhanovskyi, C<vti@cpan.org>.
 
 L<Twiggy> authors.
 
+Johannes Plunien (plu)
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2011, Viacheslav Tykhanovskyi
