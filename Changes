@@ -1,5 +1,7 @@
 Revision history for perl module Fliggy
 
+ - Handle EOF of sockets properly
+
 0.009002 2011-06-26
 
  - Smart reading of the first request line
